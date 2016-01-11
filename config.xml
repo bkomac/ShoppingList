@@ -2,7 +2,7 @@
 <widget id="com.ionicframework.shopinglist979163" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>iShopping List</name>
   <description>
-        Inteligent shopping list
+        Intelligent shopping list
     </description>
   <author email="b@komac.si" href="http://lab.komac.si/">
       Borut Komac
@@ -15,7 +15,7 @@
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
-  <preference name="SplashScreenDelay" value="3000"/>
+  <preference name="SplashScreenDelay" value="1000"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>

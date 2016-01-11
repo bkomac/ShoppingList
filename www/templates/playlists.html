@@ -1,10 +1,19 @@
 <ion-view view-title="Playlists"> <ion-content>
- 
-<ion-list ng-controller="PlaylistsCtrl"
+ <div class="bar bar-header item-input-inset">
+  <label class="item-input-wrapper">
+    <i class="icon ion-plus-circled placeholder-icon"></i>
+    <input type="text" placeholder="Dodaj" ng-model="addInput">
+  </label>
+  <button class="button button-clear" ng-click="addItem(addInput)">
+    Dodaj
+  </button>
+</div>
+
+<ion-list ng-controller="PlaylistsCtrl" 
           show-delete="true"
           show-reorder="true"
-          can-swipe="true">
-  <ion-item ng-repeat="item in playlists">
+          can-swipe="true" >
+  <ion-item ng-repeat="item in items">
     
     <h2>{{item.title}}</h2>
     <p>{{item.description}}</p>
@@ -20,7 +29,7 @@
                        ng-click="items.splice($index, 1)">
     </ion-delete-button>
     <ion-reorder-button class="ion-navicon"
-                        on-reorder="reorderItem(item, $fromIndex, $toIndex)">
+                        on-reorder="moveItem(item, $fromIndex, $toIndex)">
     </ion-reorder-button>
 
   </ion-item>
