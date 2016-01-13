@@ -41,51 +41,40 @@ angular.module('starter.controllers', [])
 	};
 })
 
-.controller('PlaylistsCtrl', function($scope) {
+.controller('ListCtrl', function($scope) {
 	$scope.items = [];
+	if (window.localStorage['list'] == undefined) {
+		window.localStorage['list'] = JSON.stringify($scope.items);
+	} else
+		$scope.items = JSON.parse(window.localStorage['list']);
 
 	$scope.addItem = function(input) {
-		console.log("Dodajam: " + input);
+		if (input != undefined) {
+			console.log("Dodajam: " + input);
 
-		$scope.items.push({
-			title : input,
-			id : 0,
-			description : 'Good music'
-		});
-		
+			$scope.items.push({
+				title : input,
+				description : 'Nov artikel'
+			});
+
+			window.localStorage['list'] = JSON.stringify($scope.items);
+		}
 	};
 
-	$scope.items = [ {
-		title : 'Reggae',
-		id : 1,
-		description : 'Good music'
-	}, {
-		title : 'Chill',
-		id : 2,
-		description : 'Good music'
-	}, {
-		title : 'Dubstep',
-		id : 3,
-		description : 'Good music'
-	}, {
-		title : 'Indie',
-		id : 4,
-		description : 'Good music'
-	}, {
-		title : 'Rap',
-		id : 5,
-		description : 'Good music gg'
-	}, {
-		title : 'Cowbell',
-		id : 6,
-		description : 'Good music'
-	} ];
+	$scope.edit = function(item) {
+		console.log("edit:" + item.title);
+	}
 
 	$scope.moveItem = function(item, fromIndex, toIndex) {
 		console.log("form:" + fromIndex + " to:" + toIndex);
 		$scope.items.splice(fromIndex, 1);
 		$scope.items.splice(toIndex, 0, item);
 	};
+	
+	$scope.deleteItem = function(index) {
+		$scope.items.splice(index, 1);
+		window.localStorage['list'] = JSON.stringify($scope.items);
+	}
 
 })
 
