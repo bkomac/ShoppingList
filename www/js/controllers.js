@@ -1,7 +1,9 @@
+var app;
 angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
+	app = new App();
 	// With the new view caching in Ionic, Controllers are only called
 	// when they are recreated or on app start, instead of every page change.
 	// To listen for when this page is active (for example, to refresh data),
@@ -41,41 +43,58 @@ angular.module('starter.controllers', [])
 	};
 })
 
-.controller('MenuCtrl', function($scope) {
-	console.log("Menu ctrl...");
-	var app = new App();
-	$scope.lists = app.getFromStorage();
+.controller('MenuCtrl', function($scope, $ionicPopup, $ionicHistory) {
+	app.log("Menu ctrl...");
+
+	$scope.lists = app.getLists();
+
+	$scope.setCurrentList = function(list) {
+		app.log("seting Current list: " + list.name);
+		app.setCurrentList(list);
+		$scope.currentList = list;
+	}
+
+	$scope.showAddListPopup = function() {
+		$scope.data = {};
+
+		var myPopup = $ionicPopup.show({
+			template : 'Name: <input type="text" placeholder="List name" ng-model="data.newListName">',
+			title : 'Add new shopping list',
+			scope : $scope,
+			buttons : [ {
+				text : 'Cancel'
+			}, {
+				text : '<b>Save</b>',
+				type : 'button-positive',
+				onTap : function(e) {
+
+					if ($scope.data.newListName != undefined) {
+						app.addNewList(new List(123, $scope.data.newListName));
+						return $scope.data.newListName;
+					} else {
+						e.preventDefault();
+					}
+				}
+			}]
+		})
+	}
 
 })
 
-.controller('ListCtrl', function($scope) {
-
-	var app = new App();
-	var list = new List();
-
+.controller('ListCtrl', function($scope, $stateParams) {
+	app.log("ListCtrl ..."+$stateParams.listId);
+	$scope.$on('$ionicView.afterEnter', function() {
+		app.log("ListCtrl ...2");
+		$scope.currentList = app.findList($stateParams.listId);
+	});
+	
 	$scope.deleteEnabled = false;
-	$scope.items = list.items;
-
-	if ($scope.lists == undefined) {
-		$scope.lists = [ {
-			name : 'Špar',
-			items : $scope.items
-		}, {
-			name : 'Merkur',
-			items : $scope.items
-		}, {
-			name : 'Mercator',
-			items : $scope.items
-		} ];
-	}
-
-//	if (window.localStorage['lists'] == undefined) {
-//		window.localStorage['lists'] = JSON.stringify($scope.lists);
-//	} else
-//		$scope.lists = JSON.parse(window.localStorage['lists']);
-
-	$scope.selectedList = $scope.lists[0];
-	$scope.items = $scope.selectedList.items;
+	
+	if ($scope.currentList == undefined)
+		$scope.showAddListPopup();
+	app.log("*Current list: " + $scope.currentList.name);
+	$scope.items = $scope.currentList.items;
+	$scope.currentList = app.findList($stateParams.listId);
 
 	$scope.addItem = function(input) {
 		if (input != undefined) {
@@ -117,13 +136,6 @@ angular.module('starter.controllers', [])
 		// window.localStorage['lists'] = JSON.stringify(lists);
 		app.persistToStorage(lists);
 	}
-
-	var list = new List();
-	list.name = "Špar";
-
-	list.items.push(new Item("Mleko", "Mlečni izdelek"));
-
-	app.persistToStorage(list);
 
 })
 

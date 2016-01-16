@@ -1,4 +1,4 @@
-<ion-view view-title="Shopping List > {{selectedList.name}}" ng-controller="ListCtrl"> 
+<ion-view view-title="Shopping List > {{currentList.name}}" ng-controller="ListCtrl"> 
 <ion-nav-buttons side="right">
         <button class="right button button-icon icon ion-trash-b" ng-click="tolledgeDelete()"></button>
 </ion-nav-buttons>
@@ -7,7 +7,7 @@
 <div class="bar bar-header item-input-inset">
   <label class="item-input-wrapper">
     <i class="icon ion-ios-arrow-right placeholder-icon"></i>
-    <input type="text" placeholder="Dodaj artikel" ng-model="addInput">
+    <input type="text" placeholder="Add item" ng-model="addInput">
   </label> 
   <a class="button button-icon icon ion-ios-plus" ng-click="addItem(addInput);addInput=undefined"></a>
 </div>

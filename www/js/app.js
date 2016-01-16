@@ -50,7 +50,7 @@ angular.module('starter', [ 'ionic', 'starter.controllers' ])
 			}
 		}
 	}).state('app.list', {
-		url : '/list',
+		url : '/list/:listId',
 		views : {
 			'menuContent' : {
 				templateUrl : 'templates/list.html',
@@ -77,26 +77,63 @@ angular.module('starter', [ 'ionic', 'starter.controllers' ])
  */
 var App = function() {
 
+	this.lists;
+	this.currentList;
+
+	this.getLists = function() {
+		if (this.lists == undefined)
+			this.lists = this.getFromStorage();
+
+		return this.lists;
+	}
+	
+	this.findList = function(id) {
+		this.getLists().forEach(function(list) {
+		        if (list.id == id){
+		        	app.log("Found list: "+list.name);
+		        	return list;
+		        }else
+		        	return this.getLists()[3];
+		      });
+	}
+
+	this.getCurrentList = function() {
+		if (this.currentList == undefined)
+			this.currentList = this.getLists()[0];
+
+		return this.currentList;
+	}
+
+	this.setCurrentList = function(list) {
+		this.currentList = list;
+	}
+
 	this.getFromStorage = function() {
 		if (window.localStorage['lists'] != undefined)
 			return JSON.parse(window.localStorage['lists']);
+		else
+			return [];
 	}
 
-	/**
-	 * Persists data to storage.
-	 */
 	this.persistToStorage = function(data) {
 		window.localStorage['lists'] = JSON.stringify(data);
 	}
-	
+
+	this.addNewList = function(newList) {
+		this.log("Adding new list: " + newList.name);
+		this.getLists().push(newList);
+		this.currentList = newList;
+		this.persistToStorage(this.lists);
+	}
+
 	this.log = function(text) {
 		console.log(text);
 	}
 }
 
 var List = function(id, name, description) {
-	this.id = id;
-	this.name = name;
+	this.id = id || 0;
+	this.name = name || "";
 	this.items = [];
 	this.description = description || "";
 	this.geoposition = "";
