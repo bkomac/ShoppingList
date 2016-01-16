@@ -41,23 +41,52 @@ angular.module('starter.controllers', [])
 	};
 })
 
+.controller('MenuCtrl', function($scope) {
+	console.log("Menu ctrl...");
+	var app = new App();
+	$scope.lists = app.getFromStorage();
+
+})
+
 .controller('ListCtrl', function($scope) {
-	$scope.items = [];
-	if (window.localStorage['list'] == undefined) {
-		window.localStorage['list'] = JSON.stringify($scope.items);
-	} else
-		$scope.items = JSON.parse(window.localStorage['list']);
+
+	var app = new App();
+	var list = new List();
+
+	$scope.deleteEnabled = false;
+	$scope.items = list.items;
+
+	if ($scope.lists == undefined) {
+		$scope.lists = [ {
+			name : 'Špar',
+			items : $scope.items
+		}, {
+			name : 'Merkur',
+			items : $scope.items
+		}, {
+			name : 'Mercator',
+			items : $scope.items
+		} ];
+	}
+
+//	if (window.localStorage['lists'] == undefined) {
+//		window.localStorage['lists'] = JSON.stringify($scope.lists);
+//	} else
+//		$scope.lists = JSON.parse(window.localStorage['lists']);
+
+	$scope.selectedList = $scope.lists[0];
+	$scope.items = $scope.selectedList.items;
 
 	$scope.addItem = function(input) {
 		if (input != undefined) {
 			console.log("Dodajam: " + input);
 
-			$scope.items.push({
+			$scope.items.unshift({
 				title : input,
-				description : 'Nov artikel'
+				description : 'Nov artikel',
+				image : 'Alpsko_mleko_3.5_m.m_1L.jpg'
 			});
-
-			window.localStorage['list'] = JSON.stringify($scope.items);
+			persistToStorage($scope.lists);
 		}
 	};
 
@@ -69,12 +98,32 @@ angular.module('starter.controllers', [])
 		console.log("form:" + fromIndex + " to:" + toIndex);
 		$scope.items.splice(fromIndex, 1);
 		$scope.items.splice(toIndex, 0, item);
+		persistToStorage($scope.lists);
 	};
-	
+
 	$scope.deleteItem = function(index) {
 		$scope.items.splice(index, 1);
-		window.localStorage['list'] = JSON.stringify($scope.items);
+		persistToStorage($scope.lists);
 	}
+
+	$scope.tolledgeDelete = function() {
+		if ($scope.deleteEnabled)
+			$scope.deleteEnabled = false;
+		else
+			$scope.deleteEnabled = true;
+	}
+
+	var persistToStorage = function(lists) {
+		// window.localStorage['lists'] = JSON.stringify(lists);
+		app.persistToStorage(lists);
+	}
+
+	var list = new List();
+	list.name = "Špar";
+
+	list.items.push(new Item("Mleko", "Mlečni izdelek"));
+
+	app.persistToStorage(list);
 
 })
 

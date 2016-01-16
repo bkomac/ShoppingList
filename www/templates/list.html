@@ -1,24 +1,22 @@
-<ion-view view-title="Shopping list" ng-controller="ListCtrl"> 
+<ion-view view-title="Shopping List > {{selectedList.name}}" ng-controller="ListCtrl"> 
+<ion-nav-buttons side="right">
+        <button class="right button button-icon icon ion-trash-b" ng-click="tolledgeDelete()"></button>
+</ion-nav-buttons>
 
-<ion-content has-subheader>
- 
+<ion-content>
 <div class="bar bar-header item-input-inset">
   <label class="item-input-wrapper">
     <i class="icon ion-ios-arrow-right placeholder-icon"></i>
     <input type="text" placeholder="Dodaj artikel" ng-model="addInput">
   </label> 
   <a class="button button-icon icon ion-ios-plus" ng-click="addItem(addInput);addInput=undefined"></a>
-  
-  <ion-nav-buttons side="right">
-        <button class="right button button-icon icon ion-gear-a" ng-click="insert()"></button>
-</ion-nav-buttons>
 </div>
 
 
-<ion-list show-delete="true" show-reorder="true" >                 
+<ion-list show-delete="deleteEnabled" show-reorder="true">                 
           
-  <ion-item ng-repeat="item in items track by $index" >
-    
+  <ion-item ng-repeat="item in items track by $index" class="item-avatar" >
+    <img src="products/{{item.image}}" height="40px">
     <h2>{{item.title}}</h2>
     <ion-option-button class="button-positive"
                        ng-click="share(item)">
