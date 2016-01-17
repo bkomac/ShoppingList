@@ -49,7 +49,7 @@ angular.module('starter', [ 'ionic', 'starter.controllers' ])
 				templateUrl : 'templates/browse.html'
 			}
 		}
-	}).state('app.list', {
+	}).state('app.listId', {
 		url : '/list/:listId',
 		views : {
 			'menuContent' : {
@@ -57,9 +57,15 @@ angular.module('starter', [ 'ionic', 'starter.controllers' ])
 				controller : 'ListCtrl'
 			}
 		}
-	})
-
-	.state('app.single', {
+	}).state('app.list', {
+		url : '/list',
+		views : {
+			'menuContent' : {
+				templateUrl : 'templates/list.html',
+				controller : 'ListCtrl'
+			}
+		}
+	}).state('app.singleId', {
 		url : '/playlists/:playlistId',
 		views : {
 			'menuContent' : {
@@ -86,15 +92,27 @@ var App = function() {
 
 		return this.lists;
 	}
-	
-	this.findList = function(id) {
+
+	this.findList = function(id, callback) {
+		var found = false;
 		this.getLists().forEach(function(list) {
-		        if (list.id == id){
-		        	app.log("Found list: "+list.name);
-		        	return list;
-		        }else
-		        	return this.getLists()[3];
-		      });
+			if (list.id == id) {
+				app.log("Found list: " + list.name);
+				callback(list);
+				found = true;
+			}
+		});
+
+		if (!found) {
+			var lists = app.getLists();
+			if (lists != undefined && lists.length > 0) {
+				app.log("Vrnemo prvi list...");
+				callback(lists[0]);
+			} else {
+				app.log("Vrnemo prvi undefined...");
+				callback(undefined);
+			}
+		}
 	}
 
 	this.getCurrentList = function() {
@@ -121,9 +139,10 @@ var App = function() {
 
 	this.addNewList = function(newList) {
 		this.log("Adding new list: " + newList.name);
-		this.getLists().push(newList);
+		this.getLists().unshift(newList);
 		this.currentList = newList;
 		this.persistToStorage(this.lists);
+		
 	}
 
 	this.log = function(text) {

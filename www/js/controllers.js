@@ -43,7 +43,7 @@ angular.module('starter.controllers', [])
 	};
 })
 
-.controller('MenuCtrl', function($scope, $ionicPopup, $ionicHistory) {
+.controller('MenuCtrl', function($scope, $ionicPopup, $ionicHistory, $state) {
 	app.log("Menu ctrl...");
 
 	$scope.lists = app.getLists();
@@ -69,42 +69,46 @@ angular.module('starter.controllers', [])
 				onTap : function(e) {
 
 					if ($scope.data.newListName != undefined) {
-						app.addNewList(new List(123, $scope.data.newListName));
+						app.addNewList(new List($scope.data.newListName, $scope.data.newListName));
+						$scope.setCurrentList(app.getCurrentList());
+						
+						 $state.go("app.list");
 						return $scope.data.newListName;
 					} else {
 						e.preventDefault();
 					}
 				}
-			}]
+			} ]
 		})
 	}
 
 })
 
 .controller('ListCtrl', function($scope, $stateParams) {
-	app.log("ListCtrl ..."+$stateParams.listId);
-	$scope.$on('$ionicView.afterEnter', function() {
-		app.log("ListCtrl ...2");
-		$scope.currentList = app.findList($stateParams.listId);
-	});
-	
+	app.log("ListCtrl ..." + $stateParams.listId);
+
 	$scope.deleteEnabled = false;
-	
+
+	app.findList($stateParams.listId, function(list) {
+		$scope.currentList = list;
+	});
+
 	if ($scope.currentList == undefined)
 		$scope.showAddListPopup();
-	app.log("*Current list: " + $scope.currentList.name);
-	$scope.items = $scope.currentList.items;
-	$scope.currentList = app.findList($stateParams.listId);
+	else {
+		app.log("*Current list: " + $scope.currentList.name);
+		$scope.items = $scope.currentList.items;
+	}
+
+	$scope.selectItem = function(item) {
+		app.log("Selected:" + item.name);
+	}
 
 	$scope.addItem = function(input) {
 		if (input != undefined) {
 			console.log("Dodajam: " + input);
-
-			$scope.items.unshift({
-				title : input,
-				description : 'Nov artikel',
-				image : 'Alpsko_mleko_3.5_m.m_1L.jpg'
-			});
+			var item = new Item(input);
+			$scope.items.unshift(item);
 			persistToStorage($scope.lists);
 		}
 	};
