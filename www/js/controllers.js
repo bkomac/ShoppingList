@@ -1,5 +1,5 @@
 var app;
-angular.module('starter.controllers', [])
+angular.module('i3.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
@@ -71,8 +71,8 @@ angular.module('starter.controllers', [])
 					if ($scope.data.newListName != undefined) {
 						app.addNewList(new List($scope.data.newListName, $scope.data.newListName));
 						$scope.setCurrentList(app.getCurrentList());
-						
-						 $state.go("app.list");
+
+						$state.go("app.list");
 						return $scope.data.newListName;
 					} else {
 						e.preventDefault();
@@ -84,8 +84,22 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('ListCtrl', function($scope, $stateParams) {
+.controller('ListCtrl', function($scope, $stateParams, $ionicPopover) {
 	app.log("ListCtrl ..." + $stateParams.listId);
+
+	$ionicPopover.fromTemplateUrl('my-popover.html', {
+		scope : $scope
+	}).then(function(popover) {
+		$scope.popover = popover;
+	});
+	
+	$scope.$on('$destroy', function() {
+	    $scope.popover.remove();
+	  });
+
+	$scope.openPopover = function($event) {
+		$scope.popover.show($event);
+	};
 
 	$scope.deleteEnabled = false;
 
@@ -98,12 +112,21 @@ angular.module('starter.controllers', [])
 	else {
 		app.log("*Current list: " + $scope.currentList.name);
 		$scope.items = $scope.currentList.items;
+		$scope.purchasedItems = $scope.currentList.purchasedItems;
 	}
 
-	$scope.selectItem = function(item) {
-		app.log("Selected:" + item.name);
+	$scope.toChartItem = function(index) {
+		$scope.purchasedItems.push($scope.items[index]);
+		$scope.items.splice(index, 1);
+		persistToStorage($scope.lists);
 	}
-
+	
+	$scope.undoToChartItem = function(index) {
+		$scope.items.push($scope.purchasedItems[index]);
+		$scope.purchasedItems.splice(index, 1);
+		persistToStorage($scope.lists);
+	}
+	
 	$scope.addItem = function(input) {
 		if (input != undefined) {
 			console.log("Dodajam: " + input);
@@ -130,6 +153,7 @@ angular.module('starter.controllers', [])
 	}
 
 	$scope.tolledgeDelete = function() {
+		$scope.popover.hide();
 		if ($scope.deleteEnabled)
 			$scope.deleteEnabled = false;
 		else

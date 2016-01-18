@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', [ 'ionic', 'starter.controllers' ])
+angular.module('i3', [ 'ionic', 'i3.controllers' ])
 
 .run(function($ionicPlatform) {
 	$ionicPlatform.ready(function() {
@@ -154,6 +154,7 @@ var List = function(id, name, description) {
 	this.id = id || 0;
 	this.name = name || "";
 	this.items = [];
+	this.purchasedItems = [];
 	this.description = description || "";
 	this.geoposition = "";
 
