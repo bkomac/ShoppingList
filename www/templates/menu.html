@@ -21,14 +21,14 @@
         <ion-item menu-close ng-click="login()">
           Login
         </ion-item>
-        <ion-item menu-close href="#/app/search">
-          Search
+        <ion-item menu-close href="#/app/settings">
+          Settings
         </ion-item>
-        <ion-item menu-close href="#/app/browse" >
-          Browse
+        <ion-item menu-close href="#/app/catalog" >
+          Catalog
         </ion-item>
         <div class="item item-divider item-icon-right">
-            Shopping lists
+            <b>Shopping lists</b>
           <a class="icon ion-ios-plus" menu-close ng-click="showAddListPopup()"></a>
   		</div>
         <ion-item menu-close href="#/app/list/{{list.id}}" ng-repeat="list in lists track by $index" ng-click="setCurrentList(list)">

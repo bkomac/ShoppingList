@@ -1,0 +1,10 @@
+<ion-view view-title="Catalog">
+  <ion-content>
+    <ion-list>                 
+  		<ion-item ng-repeat="item in catalog.items track by $index" class="item-icon-left">
+    		<a class="icon ion-ios-checkmark enable-pointer-events"></a>
+    		<h2>{{item.name}}</h2>
+  		</ion-item>
+	</ion-list>
+  </ion-content>
+</ion-view>

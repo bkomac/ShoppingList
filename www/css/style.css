@@ -11,8 +11,13 @@ ion-popover-view.fit ion-content {
 	margin-top: 0px !important;
 }
 
+.menu-header {
+	height: 60px;
+	background-color: #4d94ff;
+	margin-bottom: 10px
+}
 
-.bar.bar-stablex{
+.bar.bar-stable{
 	background-color: #4d94ff;
 }
 

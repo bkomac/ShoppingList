@@ -1,9 +1,12 @@
 var app;
+
 angular.module('i3.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
 	app = new App();
+	idb = new IDB();
+	idb.initDB();
 	// With the new view caching in Ionic, Controllers are only called
 	// when they are recreated or on app start, instead of every page change.
 	// To listen for when this page is active (for example, to refresh data),
@@ -84,24 +87,36 @@ angular.module('i3.controllers', [])
 
 })
 
-.controller('ListCtrl', function($scope, $stateParams, $ionicPopover) {
+.controller('ListCtrl', function($scope, $stateParams, $ionicPopover, $q, $timeout) {
 	app.log("ListCtrl ..." + $stateParams.listId);
 
-	$ionicPopover.fromTemplateUrl('my-popover.html', {
+	var catalog = app.getCatalog();
+	$scope.deleteEnabled = false;
+	$scope.form = {};
+
+	$ionicPopover.fromTemplateUrl('menu-popover.html', {
 		scope : $scope
 	}).then(function(popover) {
 		$scope.popover = popover;
 	});
-	
+
 	$scope.$on('$destroy', function() {
-	    $scope.popover.remove();
-	  });
+		$scope.popover.remove();
+	});
+
+	$ionicPopover.fromTemplateUrl('hint-popover.html', {
+		scope : $scope
+	}).then(function(popover) {
+		$scope.hintPopover = popover;
+	});
+
+	$scope.$on('$destroy', function() {
+		$scope.hintPopover.remove();
+	});
 
 	$scope.openPopover = function($event) {
 		$scope.popover.show($event);
 	};
-
-	$scope.deleteEnabled = false;
 
 	app.findList($stateParams.listId, function(list) {
 		$scope.currentList = list;
@@ -120,19 +135,31 @@ angular.module('i3.controllers', [])
 		$scope.items.splice(index, 1);
 		persistToStorage($scope.lists);
 	}
-	
+
 	$scope.undoToChartItem = function(index) {
 		$scope.items.push($scope.purchasedItems[index]);
 		$scope.purchasedItems.splice(index, 1);
 		persistToStorage($scope.lists);
 	}
-	
+
 	$scope.addItem = function(input) {
-		if (input != undefined) {
-			console.log("Dodajam: " + input);
+		if (input != undefined && input != "") {
+			app.log("Dodajam: " + input);
 			var item = new Item(input);
-			$scope.items.unshift(item);
-			persistToStorage($scope.lists);
+			if ($scope.items.indexOf(item) < 0) {
+				$scope.items.unshift(item);
+				persistToStorage($scope.lists);
+			}
+
+			if (catalog.items.indexOf(item) < 0) {
+				catalog.items.push(new CatalogItem(new Date().getTime(), input, ""));
+				app.setCatalog(catalog);
+			}
+
+			idb.addToCatalog(item);
+
+			$scope.form.addInput = '';
+			$scope.hits = [];
 		}
 	};
 
@@ -160,12 +187,51 @@ angular.module('i3.controllers', [])
 			$scope.deleteEnabled = true;
 	}
 
+	var search = function(key, $event) {
+		if (key != "") {
+			var matches = app.getCatalog().items.filter(function(item) {
+				if (item.name.toLowerCase().indexOf(key.toLowerCase()) !== -1)
+					return true;
+			});
+		}
+		return matches;
+	}
+
+	$scope.complete = function(key, $event) {
+		app.log("=" + key);
+		$scope.hits = search(key, $event);
+	}
+
 	var persistToStorage = function(lists) {
 		// window.localStorage['lists'] = JSON.stringify(lists);
 		app.persistToStorage(lists);
 	}
 
+	$scope.hideHits = function() {
+		$scope.deleteEnabled = false;
+		$scope.hits = [];
+	}
+
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
+.controller('CatalogCtrl', function($scope, $stateParams) {
+
+	$scope.catalog = app.getCatalog();
+
+})
+
+.controller('SettingsCtrl', function($scope, $stateParams) {
+
+	var db = new IDB();
+	db.initDB();
+
+	$scope.initDb = function() {
+		db.addToCatalog({
+			"id" : new Date().getTime(),
+			"name" : "Bobo2"
+		});
+
+		// db.closeDB();
+	}
+
 });

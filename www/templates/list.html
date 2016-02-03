@@ -1,4 +1,4 @@
-<ion-view view-title="{{currentList.name==undefined?'':currentList.name}}" > 
+<ion-view view-title="{{currentList.name==undefined?'':currentList.name}}" ng-click="hideHits()"> 
 <ion-nav-buttons side="right">
         <button class="right button button-icon icon ion-android-more-vertical" ng-click="openPopover($event)"></button>
 </ion-nav-buttons>
@@ -7,11 +7,18 @@
 <div class="bar bar-header item-input-inset">
   <label class="item-input-wrapper">
     <i class="icon ion-ios-arrow-right placeholder-icon"></i>
-    <input type="text" placeholder="Add item" ng-model="addInput">
+    <input type="text" placeholder="Add item" ng-model="form.addInput" ng-change="complete(form.addInput,$event)">
   </label> 
-  <a class="button button-icon icon ion-ios-plus" ng-click="addItem(addInput);addInput=undefined"></a>
+  <a class="button button-icon icon ion-ios-plus" ng-click="addItem(form.addInput);form.addInput=undefined"></a>
 </div>
-
+ <ul class="list list-inset" ng-show="hits.length >0" style="margin-top: 4px">
+ 	<div class="item item-divider item-icon-right">
+            <b><small>History</small></b>
+  	</div>
+    <li class="item" ng-repeat="hit in hits" ng-click="addItem(hit.name);hits=undefined">
+      	<h2>{{hit.name}}</h2>
+    </li>
+ </ul>
 
 <ion-list show-delete="deleteEnabled" show-reorder="true" >                 
           
@@ -46,7 +53,7 @@
 </ion-content> 
 </ion-view>
 
-<script id="my-popover.html" type="text/ng-template">
+<script id="menu-popover.html" type="text/ng-template">
   <ion-popover-view class="fit">
     <ion-content>
      <div class="list list-inset">
@@ -56,10 +63,22 @@
 		<div class="item" href="#">
     		Edit list
   		</div>
-  		<div class="item" href="#">
+  		<a class="item" href="#/app/settings" ng-click="popover.hide()">
     		Settings
-  		</div>
+  		</a>
 	</div>
+    </ion-content>
+  </ion-popover-view>
+</script>
+
+<script id="hint-popover.html" type="text/ng-template">
+  <ion-popover-view class="fit">
+    <ion-content>
+     <ul class="list">
+    	<li class="item" ng-repeat="hit in hits">
+      		<i>{{hit.name}}</i>
+    	</li>
+  	 </ul>
     </ion-content>
   </ion-popover-view>
 </script>

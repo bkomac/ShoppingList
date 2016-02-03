@@ -20,6 +20,7 @@ angular.module('i3', [ 'ionic', 'i3.controllers' ])
 			// org.apache.cordova.statusbar required
 			StatusBar.styleDefault();
 		}
+		
 	});
 })
 
@@ -33,20 +34,22 @@ angular.module('i3', [ 'ionic', 'i3.controllers' ])
 		controller : 'AppCtrl'
 	})
 
-	.state('app.search', {
-		url : '/search',
+	.state('app.settings', {
+		url : '/settings',
 		views : {
 			'menuContent' : {
-				templateUrl : 'templates/search.html'
+				templateUrl : 'templates/settings.html',
+				controller : 'SettingsCtrl'
 			}
 		}
 	})
 
-	.state('app.browse', {
-		url : '/browse',
+	.state('app.catalog', {
+		url : '/catalog',
 		views : {
 			'menuContent' : {
-				templateUrl : 'templates/browse.html'
+				templateUrl : 'templates/catalog.html',
+				controller : 'CatalogCtrl'
 			}
 		}
 	}).state('app.listId', {
@@ -85,6 +88,7 @@ var App = function() {
 
 	this.lists;
 	this.currentList;
+	this.catalog;
 
 	this.getLists = function() {
 		if (this.lists == undefined)
@@ -137,12 +141,48 @@ var App = function() {
 		window.localStorage['lists'] = JSON.stringify(data);
 	}
 
+	
+	this.getCatalog = function() {
+		if (this.catalog != undefined)
+			return this.catalog;
+
+		if (window.localStorage['catalog'] != undefined)
+			return JSON.parse(window.localStorage['catalog']);
+		else{
+			this.catalog = new Catalog("first");
+			this.setCatalog(this.catalog);
+			return this.catalog;
+		}
+	}
+
+	this.setCatalog = function(data) {
+		window.localStorage['catalog'] = JSON.stringify(data);
+	}
+
 	this.addNewList = function(newList) {
 		this.log("Adding new list: " + newList.name);
 		this.getLists().unshift(newList);
 		this.currentList = newList;
 		this.persistToStorage(this.lists);
-		
+
+	}
+
+	this.search = function(key) {
+
+		var deferred = $q.defer();
+
+		var matches = this.getCatalog().items.filter(function(item) {
+			if (item.name.toLowerCase().indexOf(key.toLowerCase()) !== -1)
+				return true;
+		})
+
+		$timeout(function() {
+
+			deferred.resolve(matches);
+
+		}, 100);
+
+		return deferred.promise;
 	}
 
 	this.log = function(text) {
@@ -157,13 +197,25 @@ var List = function(id, name, description) {
 	this.purchasedItems = [];
 	this.description = description || "";
 	this.geoposition = "";
-
 };
 
-var Item = function(name, description) {
+var Item = function(name, description, id) {
+	this.id = id || new Date().getTime();
 	this.name = name;
-	this.description = description;
+	this.description = description || '';
 	this.quantity = 1;
 	this.image;
+}
+
+var Catalog = function(name, description) {
+	this.name = name;
+	this.description = description || '';
+	this.items = [];
+}
+
+var CatalogItem = function(id, name, description) {
+	this.id = id;
+	this.name = name;
+	this.description = description || '';
 
 }
