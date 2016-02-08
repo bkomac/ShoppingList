@@ -156,8 +156,6 @@ angular.module('i3.controllers', [])
 				app.setCatalog(catalog);
 			}
 
-			idb.addToCatalog(item);
-
 			$scope.form.addInput = '';
 			$scope.hits = [];
 		}
